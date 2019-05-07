@@ -302,5 +302,19 @@ class apt (
   }
 
   # required for adding GPG keys on Debian 9 (and derivatives)
-  ensure_packages(['dirmngr'])
+  case $facts['os']['name'] {
+    'Debian': {
+      if versioncmp($facts['os']['release']['major'], '9') >= 0 {
+        ensure_packages(['dirmngr'])
+        Apt::Key<| title == $title |>
+      }
+    }
+    'Ubuntu': {
+      if versioncmp($facts['os']['release']['full'], '17.04') >= 0 {
+        ensure_packages(['dirmngr'])
+        Apt::Key<| title == $title |>
+      }
+    }
+    default: { }
+  }
 }
